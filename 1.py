@@ -76,14 +76,16 @@ driver.maximize_window()
 #Read excel file
 time.sleep(8)
 
+edit_urls = []
+statuss = []
 
 print('--------------read excel file-------------------')
-workbook = load_workbook(filename="Web2Pair.xlsx")
+workbook = load_workbook(filename="Web2Pair - Copy.xlsx")
 # sheet_name = workbook.sheetnames
 # print(sheet_name)
 sheet = workbook.active
 urls = []
-x=0
+x = 0
 for i in sheet['F']: 
     url = i.value  
     if (url == None):
@@ -97,7 +99,7 @@ print(x)
 #     close_button.click()
 # except NoSuchElementException:
 #     print("don't exist such element")
-loc = "Web2Pair.xlsx"
+loc = "Web2Pair - Copy.xlsx"
  
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
@@ -156,82 +158,112 @@ for url in urls:
                     print(hsn)
                     mrp = int(rows[14])
                     Offer_price = str(rows[15])
-                    Pincodes = int(rows[16])
+                    print(Offer_price)
+                    try:
+                        Pincodes = int(rows[16])
+                    except:
+                        Pincodes = ''
                     Disticts = rows[17]
+                    print(Disticts)
                     State = rows[18]
                     Current_stock = int(rows[19])
                     mqpc = int(rows[20])
+                    print(mqpc)
                     lead_time = int(rows[21])
                     edit_url = rows[22]
                     status = rows[23]
+                    print(status)
+                    workbook.close() 
 
-                    third_part = driver.find_element_by_class_name("stock-section-fieldset")
-                    country = driver.find_elements_by_css_selector("input.input-xs")[0]
-                    print(country)
-                    country.send_keys(Country_of_origin)
-                    time.sleep(1)
-                    driver.find_element_by_class_name("ui-select-choices-row-inner").click()
-
-                    sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
-                    print(sku_value)
-                    # actions = ActionChains(driver)
-                    # actions.move_to_element(sku_value).perform()
-                    # sku_value.click()
-                    sku_value.send_keys(sku)
-                    time.sleep(1)
-                    hsn_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6 wsp-tool-tip-wrap"]/input[@type="text"]')
-                    print(hsn_value)
+                    # third_part = driver.find_element_by_class_name("stock-section-fieldset")
                     try:
+                        country = driver.find_elements_by_css_selector("input.input-xs")[0]
+                        print(country)
+                        country.send_keys(Country_of_origin)
+                        time.sleep(1)
+                        driver.find_element_by_class_name("ui-select-choices-row-inner").click()
+                    except:
+                        print('no country')
+                    try:
+                        sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
+                        print(sku_value)
+                        # actions = ActionChains(driver)
+                        # actions.move_to_element(sku_value).perform()
+                        # sku_value.click()
+                        sku_value.send_keys(sku)
+                    except:
+                        print('no sku')
+                    time.sleep(1)
+                    
+                    try:
+                        hsn_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6 wsp-tool-tip-wrap"]/input[@type="text"]')
+                        print(hsn_value)
                         hsn_value.send_keys(hsn)
                         
                     except:
                         print("sorry1")
                     time.sleep(1)
-                    mrp_value = driver.find_element_by_xpath('//div[@class="row ng-scope"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
-                    print(mrp_value)
+                    
                     try:
+                        mrp_value = driver.find_element_by_xpath('//div[@class="row ng-scope"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
+                        print(mrp_value)
                         mrp_value.send_keys(mrp)
                         
                     except:
                         print('sorry2')
                     time.sleep(1)
 
-                    offer_price_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-5 wsp-tool-tip-wrap"]/input[@type="number"]')
-                    print(offer_price_value)
                     try:
+                        offer_price_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-5 wsp-tool-tip-wrap"]/input[@type="number"]')
                         offer_price_value.send_keys(Offer_price)
-                        
+                        print(offer_price_value)
                     except:
                         print('sorry3')
                     
                     time.sleep(1)
-                    disticts_value = driver.find_elements_by_xpath('//div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
-                    print(disticts_value[0])
-                    disticts_value[0].send_keys(Disticts)
-                    time.sleep(1)
                     try:
-                        driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
+                        disticts_value = driver.find_elements_by_xpath('//div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                        print(disticts_value[0])
+                        disticts_value[0].send_keys(Disticts)
                     except:
-                        print('here')
+                        print('no disticts')
+                        
+                    time.sleep(1)
+                    if Disticts == '':
+                        print("N/A")
+                    else:
+                        try:
+                            driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
+                        except:
+                            print('here')
                     time.sleep(1)
                     print("1")
-                    pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
-                    print("2")
-                    pincode.send_keys(Pincodes)
+                    try:
+                        pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                        print("2")
+                        pincode.send_keys(Pincodes)
+                    except:
+                        print('no pincode')
                     time.sleep(1)
                     print('3')
-                    try:
-                        driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
-                    except:
-                        print('here')
+                    if Pincodes == '':
+                        print("N/A")
+                    else:
+                        try:
+                            driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
+                        except:
+                            print('here')
                     time.sleep(2)
-                    stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
-                    current_stock_input = stock[0]
-                    current_stock_input.send_keys(Current_stock)
-                    mqpc_input = stock[1]
-                    mqpc_input.send_keys(mqpc)
-                    lead_time_input = stock[2]
-                    lead_time_input.send_keys(lead_time)
+                    try:
+                        stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
+                        current_stock_input = stock[0]
+                        current_stock_input.send_keys(Current_stock)
+                        mqpc_input = stock[1]
+                        mqpc_input.send_keys(mqpc)
+                        lead_time_input = stock[2]
+                        lead_time_input.send_keys(lead_time)
+                    except:
+                        print('no stock')
                     if State == '':
                         print('sorry4')
                     else:
@@ -239,6 +271,7 @@ for url in urls:
                         for state in states:
                             try:
                                 state.click()
+                            
         
                             except:
                                 print('sorry5')
@@ -252,10 +285,13 @@ for url in urls:
                         print('here')
 
                     time.sleep(5)
-                    driver.switch_to.window(driver.window_handles[1])
-                    driver.close()
-                    driver.switch_to.window(driver.window_handles[0])
-                    print("end")
+                    try:
+                        driver.switch_to.window(driver.window_handles[1])
+                        driver.close()
+                        driver.switch_to.window(driver.window_handles[0])
+                        print("end")
+                    except:
+                        print('no button')
                     time.sleep(1)
                     try:
                         agree = driver.find_element_by_xpath('//div[@class="text-center agree ng-binding ng-scope"]/input[@type="checkbox"]')
@@ -265,58 +301,29 @@ for url in urls:
                     time.sleep(2)
                     edit_url = driver.current_url
                     print(edit_url)
-
-                    driver.find_element_by_xpath('//input[@value="PUBLISH"]').click()
+                    edit_urls.append(edit_url)
+                    try:
+                        driver.find_element_by_xpath('//input[@value="PUBLISH"]').click()
+                    except:
+                        print('no publish')
                     time.sleep(1)
                     try:
                         driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]').click()
                         time.sleep(5)
-                        status = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0]
+                        statu = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0]
+                        print('status')
                     except:
-                        status = 'Already exits'
-
-                    col = csv.writer(open("T.csv", 'w', newline="")) 
-  
-                    for row in range(sheet.nrows): 
-                        col.writerow(sheet.row_values(row))  
-                    df = pd.DataFrame(pd.read_csv("T.csv")) 
-                    df
-                    csv = chilkat.CkCsv()
-                    csv.put_HasColumnNames(True)
-                    time.sleep(1)
-
-                    success = csv.LoadFile("T.csv")
-                    if (success != True):
-                        print(csv.lastErrorText())
-                        sys.exit()
-                    kk = key -1
-                    success = csv.SetCell(kk,22,edit_url)
-                    success = csv.SetCell(kk,23,status)
-
-                    success = csv.SaveFile("V.csv")
-                    if (success != True):
-                        print(csv.lastErrorText())
-                    time.sleep(1)
-                    csvfile = "V.csv"
-                    
-                    workbook = Workbook('Web2Pair.xlsx')
-                    worksheet = workbook.add_worksheet()
-                    with open(csvfile, 'rt', encoding='utf8') as f:
-                        reader = csv.reader(f)
-                        for r, row in enumerate(reader):
-                            for c, col in enumerate(row):
-                                worksheet.write(r, c, col)
-                    workbook.close()  
-
-                    time.sleep(2)
-                    os.remove("T.csv")
-                    os.remove("V.csv")
+                        statu = 'Already exits'
+                        print('status')
+                    statuss.append(statu)
 
                     time.sleep(10)
+                    print("complete")
                     break
 
                 except:
                     j += 1
+                    print('refresh1')
                     driver.refresh()
                     time.sleep(10)
 
@@ -324,7 +331,7 @@ for url in urls:
         except:
             print('no popup')
             driver.refresh()
-            time.sleep(10)
+            time.sleep(15)
             i += 1
             continue
 
@@ -332,5 +339,58 @@ for url in urls:
     print("done" + str(key))
     key += 1
     continue  
+
+wb = xlrd.open_workbook(loc)
+sheet = wb.sheet_by_index(0)
+# sheet1 = xlrd.open_workbook("Web2Pair.xlsx").sheet_by_index(0) 
+tt = open("T.csv", 'w', newline="")
+col = csv.writer(tt) 
+
+for row in range(sheet.nrows): 
+    col.writerow(sheet.row_values(row))  
+# df = pd.DataFrame(pd.read_csv("T.csv")) 
+# df
+tt.close()
+csvv = chilkat.CkCsv()
+csvv.put_HasColumnNames(True)
+time.sleep(1)
+
+success = csvv.LoadFile("T.csv")
+if (success != True):
+    print(csvv.lastErrorText())
+    sys.exit()
+k = 0
+ee = len(edit_urls)
+print('urls:' + str(ee))
+ss = len(statuss)
+print('status:' + str(ss))
+if ee < ss:
+    ee = ss
+
+while k < ee:
+    success = csvv.SetCell(k,22,edit_urls[k])
+    success = csvv.SaveFile("V.csv")
+    success = csvv.SetCell(k,23,statuss[k])
+    success = csvv.SaveFile("V.csv")
+    k += 1
+
+
+if (success != True):
+    print(csvv.lastErrorText())
+time.sleep(1)
+csvfile = "V.csv"
+
+workbook = Workbook('Web2Pair-1.xlsx')
+worksheet = workbook.add_worksheet()
+with open(csvfile, 'rt', encoding='utf8') as f:
+    reader = csv.reader(f)
+    for r, row in enumerate(reader):
+        for c, col in enumerate(row):
+            worksheet.write(r, c, col)
+workbook.close()  
+
+time.sleep(2)
+os.remove("T.csv")
+os.remove("V.csv")
 
 print("done")

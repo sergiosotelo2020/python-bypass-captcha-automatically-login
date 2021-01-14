@@ -1,16 +1,16 @@
 import sys
 import chilkat
 
-csv = chilkat.CkCsv()
-csv.put_HasColumnNames(True)
+csvv = chilkat.CkCsv()
+csvv.put_HasColumnNames(True)
 
-success = csv.LoadFile("T.csv")
+success = csvv.LoadFile("T.csv")
 if (success != True):
-    print(csv.lastErrorText())
+    print(csvv.lastErrorText())
     sys.exit()
 
-success = csv.SetCell(0,22,"baguette")
+success = csvv.SetCell(0,22,"baguette")
 
-success = csv.SaveFile("V.csv")
+success = csvv.SaveFile("V1.csv")
 if (success != True):
-    print(csv.lastErrorText())
+    print(csvv.lastErrorText())
