@@ -5,6 +5,8 @@ import re
 import os
 import json
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait  # for implicit and explict waits
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -24,58 +26,66 @@ import xlrd
 import pandas as pd
 from xlsxwriter.workbook import Workbook
 
-
+option = webdriver.ChromeOptions()
+option.add_argument('headless')
 today = date.today()
 # now = datetime.now()
 current_time = today.strftime("%m%d%y")
 print(current_time)
 file_name = input("Enter the excel file name: ")
-driver = selenium.webdriver.Chrome()
-
-base_url = 'https://sso.gem.gov.in/ARXSSO/oauth/login'
-
-driver.get(base_url)
-time.sleep(5)
-driver.implicitly_wait(5)
-element = driver.find_element_by_id("captcha1")
-location = element.location
-size = element.size
-driver.save_screenshot("pageImage.png")
-
-# crop image
-x = location['x']
-y = location['y']
-width = location['x']+size['width']
-height = location['y']+size['height']
-im = Image.open('pageImage.png')
-im = im.crop((int(x), int(y), int(width), int(height)))
-im.save('element.png')
-pytesseract.pytesseract.tesseract_cmd = r'C:/Users/Master/AppData/Local/tesseract.exe'
-text = pytesseract.image_to_string(Image.open("element.png"))
-print(text)
-# element=driver.find_element_by_xpath('//span[@class="last-page"]')
+driver = webdriver.Chrome('chromedriver')
+# driver = selenium.webdriver.Chrome()
 ComapnyName = "Appex Corporate Solutions"
 GemUsername = "Appex_corp22"
 GemPassword = "Mybox@005"
-print("----------start login---------------")
-user_id = driver.find_element_by_id('loginid')
-user_id.send_keys(GemUsername)
-captcha_text = driver.find_element_by_id('captcha_math')
-captcha_text.send_keys(text)
-print("--------Please insert key manually--------------")
-# i=driver.find_elements_by_css_selector('button.pagination__btn')[2].text
 
-# img_data = driver.find_element_by_id('captcha1').get_attribute('src')
-time.sleep(5)
-submit_button=driver.find_elements_by_css_selector("button.btn-nov")[0]
-submit_button.click()
+base_url = 'https://sso.gem.gov.in/ARXSSO/oauth/login'
+pp = 0
+while pp < 10:
+    driver.get(base_url)
+    time.sleep(5)
+    driver.implicitly_wait(5)
+    element = driver.find_element_by_id("captcha1")
+    location = element.location
+    size = element.size
+    driver.save_screenshot("pageImage.png")
 
-time.sleep(1)
+    # crop image
+    x = location['x']
+    y = location['y']
+    width = location['x']+size['width']
+    height = location['y']+size['height']
+    im = Image.open('pageImage.png')
+    im = im.crop((int(x), int(y), int(width), int(height)))
+    im.save('element.png')
+    pytesseract.pytesseract.tesseract_cmd = r'C:/Users/Master/AppData/Local/tesseract.exe'
+    text = pytesseract.image_to_string(Image.open("element.png"))
+    print(text)
+    # element=driver.find_element_by_xpath('//span[@class="last-page"]')
+
+    print("----------start login---------------")
+    user_id = driver.find_element_by_id('loginid')
+    user_id.send_keys(GemUsername)
+    captcha_text = driver.find_element_by_id('captcha_math')
+    captcha_text.send_keys(text)
+    print("--------Please insert key manually--------------")
+    time.sleep(5)
+    submit_button=driver.find_elements_by_css_selector("button.btn-nov")[0]
+    submit_button.click()
+
+    time.sleep(3)
+    try:
+        driver.find_element_by_id('password') 
+        break
+    except:
+        pp += 1
+print('pass bypass successfully')
 password = driver.find_element_by_id('password')
 password.send_keys(GemPassword)
 time.sleep(2)
 submit_button2 = driver.find_element_by_xpath('//button[@type="submit"]')
 submit_button2.click()
+print('login successfully')
 driver.maximize_window()
 
 #Read excel file
@@ -271,6 +281,9 @@ for url in urls:
                         print('sorry4')
                     else:
                         states = driver.find_elements_by_xpath('//td/span/input[@type="checkbox"]')
+                        try:
+                            liElement = driver.find_elements_by_xpath('//div[@class="panel-default ng-scope ng-isolate-scope panel panel-open"]/div/h4/a/span/div/div[@class="input-group-item tab-heading"]')[0]
+                            driver.execute_script("arguments[0].scrollIntoView(true);", liElement)
                         for state in states:
                             try:
                                 state.click()
@@ -297,23 +310,29 @@ for url in urls:
                         print('no button')
                     time.sleep(1)
                     try:
-                        agree = driver.find_element_by_xpath('//div[@class="text-center agree ng-binding ng-scope"]/input[@type="checkbox"]')
-                        agree.click()
+                        driver.find_element_by_css_selector("div.agree input.ng-empty")
+                        try:
+                            agree = driver.find_element_by_xpath('//div[@class="text-center agree ng-binding ng-scope"]/input[@type="checkbox"]')
+                            agree.click()
+                        except:
+                            print('here')
                     except:
-                        print('here')
+                        print('already check')
                     time.sleep(2)
                     edit_url = driver.current_url
                     print(edit_url)
                     edit_urls.append(edit_url)
+                    
                     try:
                         driver.find_element_by_xpath('//input[@value="PUBLISH"]').click()
+                        time.sleep(2)
                     except:
                         print('no publish')
                     time.sleep(1)
                     try:
                         driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]').click()
                         time.sleep(5)
-                        statu = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0]
+                        statu = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0].value()
                         print('status')
                     except:
                         statu = 'Already exits'
@@ -383,7 +402,7 @@ if (success != True):
 time.sleep(1)
 csvfile = "V.csv"
 
-workbook = Workbook(file_name)
+workbook = Workbook("result" + file_name)
 worksheet = workbook.add_worksheet()
 with open(csvfile, 'rt', encoding='utf8') as f:
     reader = csv.reader(f)

@@ -3,6 +3,8 @@ from PIL import Image
 import selenium.webdriver
 # take screenshot
 
+from tesseract import image_to_string
+
 driver = selenium.webdriver.Chrome()
 driver.get('https://sso.gem.gov.in/ARXSSO/oauth/login')
 element = driver.find_element_by_id("captcha1")
@@ -19,4 +21,6 @@ im = Image.open('pageImage.png')
 im = im.crop((int(x), int(y), int(width), int(height)))
 im.save('element.png')
 
+print(image_to_string(Image.open('element.png')))
+print(image_to_string(Image.open('element.png'), lang='eng'))
 driver.quit()
