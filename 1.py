@@ -62,16 +62,16 @@ time.sleep(15)
 submit_button=driver.find_elements_by_css_selector("button.btn-nov")[0]
 submit_button.click()
 
-time.sleep(5)
+time.sleep(1)
 password = driver.find_element_by_id('password')
 password.send_keys(GemPassword)
-time.sleep(5)
+time.sleep(1)
 submit_button2 = driver.find_element_by_xpath('//button[@type="submit"]')
 submit_button2.click()
 driver.maximize_window()
 
 #Read excel file
-time.sleep(15)
+time.sleep(8)
 
 
 print('--------------read excel file-------------------')
@@ -103,7 +103,7 @@ for url in urls:
     key = 1
     driver.get(url)
     print('-----------redirect to edit page---------------------')
-    time.sleep(15)
+    time.sleep(10)
     if driver.find_element_by_id("flox-chat-close"):
         close_button = driver.find_element_by_id("flox-chat-close")
         try:
@@ -112,15 +112,18 @@ for url in urls:
         except:
             print('here')
     i = 0
+    
     while i < 3:
-        if driver.find_element_by_class_name("popup-footer"):
+        try:
+            driver.find_element_by_class_name("popup-footer")
             popup = driver.find_element_by_class_name("popup-footer")
             popup_button = popup.find_elements_by_css_selector("*")[0]
             popup_button.click()
             time.sleep(10)
             j = 0
             while j < 3:
-                if driver.find_element_by_class_name("img-guidelines"):
+                try:
+                    driver.find_element_by_class_name("img-guidelines")
                     print('go')
                     print(sheet.row_values(key))
                     
@@ -143,12 +146,12 @@ for url in urls:
                     hsn = int(rows[13])
                     mrp = int(rows[14])
                     Offer_price = str(rows[15])
-                    Pincodes = rows[16]
+                    Pincodes = int(rows[16])
                     Disticts = rows[17]
                     State = rows[18]
                     Current_stock = int(rows[19])
-                    mqpc = rows[20]
-                    lead_time = rows[21]
+                    mqpc = int(rows[20])
+                    lead_time = int(rows[21])
                     edit_url = rows[22]
                     status = rows[23]
 
@@ -190,6 +193,35 @@ for url in urls:
                         
                     except:
                         print('sorry3')
+                    
+                    time.sleep(1)
+                    disticts_value = driver.find_elements_by_xpath('//div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                    print(disticts_value[0])
+                    disticts_value[0].send_keys(Disticts)
+                    time.sleep(1)
+                    try:
+                        driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
+                    except:
+                        print('here')
+                    time.sleep(1)
+                    print("1")
+                    pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                    print("2")
+                    pincode.send_keys(Pincodes)
+                    time.sleep(1)
+                    print('3')
+                    try:
+                        driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
+                    except:
+                        print('here')
+                    time.sleep(2)
+                    stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
+                    current_stock_input = stock[0]
+                    current_stock_input.send_keys(Current_stock)
+                    mqpc_input = stock[1]
+                    mqpc_input.send_keys(mqpc)
+                    lead_time_input = stock[2]
+                    lead_time_input.send_keys(lead_time)
                     if State == '':
                         print('sorry4')
                     else:
@@ -200,26 +232,22 @@ for url in urls:
         
                             except:
                                 print('sorry5')
-                    disticts_value = driver.find_elements_by_xpath('//div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
-                    print(disticts_value[0])
-                    disticts_value[0].send_keys(Disticts)
-                    time.sleep(1)
-                    driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
-                    disticts_value[1].send_keys(Pincodes)
-                    time.sleep(1)
-                    driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
+                    time.sleep(5)
+                    print("save")
+                    driver.find_element_by_xpath('//div[@class="col-sm-6"]/button[@class="button make-model-submit ng-scope ng-isolate-scope"]').click()
+                    time.sleep(5)
+                    driver.find_element_by_xpath('//div/a[@class="button success-button"]').click()
 
-                    stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
-
+                    time.sleep(5)
                     print("end")
 
-                    time.sleep(20)
+                    time.sleep(10)
 
 
 
 
 
-                else:
+                except:
                     j += 1
                     driver.refresh()
                     time.sleep(10)
@@ -229,8 +257,10 @@ for url in urls:
 
 
             break
-        else:
+        except:
             print('no popup')
+            driver.refresh()
+            time.sleep(10)
             i += 1
             continue
 
