@@ -1,13 +1,16 @@
-from selenium import webdriver 
-  
-# Here Chrome  will be used 
-driver = webdriver.Chrome() 
-  
-# URL of website 
-url = "https://www.geeksforgeeks.org/"
-  
-# Opening the website 
-driver.get(url) 
-  
-# Closes the current window 
-driver.close()
+import sys
+import chilkat
+
+csv = chilkat.CkCsv()
+csv.put_HasColumnNames(True)
+
+success = csv.LoadFile("T.csv")
+if (success != True):
+    print(csv.lastErrorText())
+    sys.exit()
+
+success = csv.SetCell(0,22,"baguette")
+
+success = csv.SaveFile("V.csv")
+if (success != True):
+    print(csv.lastErrorText())

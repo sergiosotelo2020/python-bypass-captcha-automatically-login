@@ -1,4 +1,5 @@
 import csv
+import chilkat
 import sys
 import re
 import os
@@ -25,6 +26,8 @@ import urllib.request
 import pandas
 from openpyxl import load_workbook
 import xlrd
+import pandas as pd
+from xlsxwriter.workbook import Workbook
 
 
 today = date.today()
@@ -58,7 +61,7 @@ print("--------Please insert key manually--------------")
 # i=driver.find_elements_by_css_selector('button.pagination__btn')[2].text
 
 # img_data = driver.find_element_by_id('captcha1').get_attribute('src')
-time.sleep(15)
+time.sleep(5)
 submit_button=driver.find_elements_by_css_selector("button.btn-nov")[0]
 submit_button.click()
 
@@ -94,13 +97,17 @@ print(x)
 #     close_button.click()
 # except NoSuchElementException:
 #     print("don't exist such element")
-loc = ("Web2Pair.xlsx")
+loc = "Web2Pair.xlsx"
  
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
 
+# sheet1 = xlrd.open_workbook("Web2Pair.xlsx").sheet_by_index(0) 
+  
+
+key = 1
 for url in urls:
-    key = 1
+    
     driver.get(url)
     print('-----------redirect to edit page---------------------')
     time.sleep(10)
@@ -128,9 +135,10 @@ for url in urls:
                     print(sheet.row_values(key))
                     
                     rows = sheet.row_values(key)
-                    key += 1
-
+                    
+                    
                     ProductCatalogID = rows[0]
+                    print(ProductCatalogID)
                     Model = rows[1]
                     Category = rows[2]
                     Brand = rows[3]
@@ -143,7 +151,9 @@ for url in urls:
                     To = rows[10]
                     Country_of_origin = rows[11]
                     sku = str(rows[12])
+                    print(sku)
                     hsn = int(rows[13])
+                    print(hsn)
                     mrp = int(rows[14])
                     Offer_price = str(rows[15])
                     Pincodes = int(rows[16])
@@ -234,27 +244,81 @@ for url in urls:
                                 print('sorry5')
                     time.sleep(5)
                     print("save")
-                    driver.find_element_by_xpath('//div[@class="col-sm-6"]/button[@class="button make-model-submit ng-scope ng-isolate-scope"]').click()
-                    time.sleep(5)
-                    driver.find_element_by_xpath('//div/a[@class="button success-button"]').click()
+                    try:
+                        driver.find_element_by_xpath('//div[@class="col-sm-6"]/button[@class="button make-model-submit ng-scope ng-isolate-scope"]').click()
+                        time.sleep(5)
+                        driver.find_element_by_xpath('//div/a[@class="button success-button"]').click()
+                    except:
+                        print('here')
 
                     time.sleep(5)
+                    driver.switch_to.window(driver.window_handles[1])
+                    driver.close()
+                    driver.switch_to.window(driver.window_handles[0])
                     print("end")
+                    time.sleep(1)
+                    try:
+                        agree = driver.find_element_by_xpath('//div[@class="text-center agree ng-binding ng-scope"]/input[@type="checkbox"]')
+                        agree.click()
+                    except:
+                        print('here')
+                    time.sleep(2)
+                    edit_url = driver.current_url
+                    print(edit_url)
+
+                    driver.find_element_by_xpath('//input[@value="PUBLISH"]').click()
+                    time.sleep(1)
+                    try:
+                        driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]').click()
+                        time.sleep(5)
+                        status = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0]
+                    except:
+                        status = 'Already exits'
+
+                    col = csv.writer(open("T.csv", 'w', newline="")) 
+  
+                    for row in range(sheet.nrows): 
+                        col.writerow(sheet.row_values(row))  
+                    df = pd.DataFrame(pd.read_csv("T.csv")) 
+                    df
+                    csv = chilkat.CkCsv()
+                    csv.put_HasColumnNames(True)
+                    time.sleep(1)
+
+                    success = csv.LoadFile("T.csv")
+                    if (success != True):
+                        print(csv.lastErrorText())
+                        sys.exit()
+                    kk = key -1
+                    success = csv.SetCell(kk,22,edit_url)
+                    success = csv.SetCell(kk,23,status)
+
+                    success = csv.SaveFile("V.csv")
+                    if (success != True):
+                        print(csv.lastErrorText())
+                    time.sleep(1)
+                    csvfile = "V.csv"
+                    
+                    workbook = Workbook('Web2Pair.xlsx')
+                    worksheet = workbook.add_worksheet()
+                    with open(csvfile, 'rt', encoding='utf8') as f:
+                        reader = csv.reader(f)
+                        for r, row in enumerate(reader):
+                            for c, col in enumerate(row):
+                                worksheet.write(r, c, col)
+                    workbook.close()  
+
+                    time.sleep(2)
+                    os.remove("T.csv")
+                    os.remove("V.csv")
 
                     time.sleep(10)
-
-
-
-
+                    break
 
                 except:
                     j += 1
                     driver.refresh()
                     time.sleep(10)
-                break
-
-
-
 
             break
         except:
@@ -265,13 +329,8 @@ for url in urls:
             continue
 
     time.sleep(5)
-    continue
-    
-
-
-        
-
-    
-
+    print("done" + str(key))
+    key += 1
+    continue  
 
 print("done")
