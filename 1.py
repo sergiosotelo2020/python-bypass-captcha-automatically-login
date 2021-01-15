@@ -33,8 +33,8 @@ today = date.today()
 current_time = today.strftime("%m%d%y")
 print(current_time)
 file_name = input("Enter the excel file name: ")
-driver = webdriver.Chrome('chromedriver')
-# driver = selenium.webdriver.Chrome()
+# driver = webdriver.Chrome('chromedriver', options = option)
+driver = selenium.webdriver.Chrome()
 ComapnyName = "Appex Corporate Solutions"
 GemUsername = "Appex_corp22"
 GemPassword = "Mybox@005"
@@ -76,10 +76,12 @@ while pp < 10:
     time.sleep(3)
     try:
         driver.find_element_by_id('password') 
+        print('captcha bypass successfully')
         break
     except:
         pp += 1
-print('pass bypass successfully')
+        print('Sorry captcha')
+
 password = driver.find_element_by_id('password')
 password.send_keys(GemPassword)
 time.sleep(2)
@@ -127,13 +129,16 @@ for url in urls:
     driver.get(url)
     print('-----------redirect to edit page---------------------')
     time.sleep(10)
-    if driver.find_element_by_id("flox-chat-close"):
+    try:
+        driver.find_element_by_id("flox-chat-close")
         close_button = driver.find_element_by_id("flox-chat-close")
         try:
             close_button.click()
             
         except:
             print('here')
+    except:
+        print('not chat box')
     i = 0
     
     while i < 3:
@@ -284,6 +289,8 @@ for url in urls:
                         try:
                             liElement = driver.find_elements_by_xpath('//div[@class="panel-default ng-scope ng-isolate-scope panel panel-open"]/div/h4/a/span/div/div[@class="input-group-item tab-heading"]')[0]
                             driver.execute_script("arguments[0].scrollIntoView(true);", liElement)
+                        except:
+                            print("no")
                         for state in states:
                             try:
                                 state.click()
@@ -332,7 +339,8 @@ for url in urls:
                     try:
                         driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]').click()
                         time.sleep(5)
-                        statu = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0].value()
+                        # statu = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0].text
+                        statu = 'Published'
                         print('status')
                     except:
                         statu = 'Already exits'
