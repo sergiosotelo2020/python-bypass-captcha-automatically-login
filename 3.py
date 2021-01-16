@@ -1,16 +1,5 @@
-import sys
-import chilkat
+str = 'Welcome to Python Examples'
 
-csvv = chilkat.CkCsv()
-csvv.put_HasColumnNames(True)
 
-success = csvv.LoadFile("T.csv")
-if (success != True):
-    print(csvv.lastErrorText())
-    sys.exit()
-
-success = csvv.SetCell(0,22,"baguette")
-
-success = csvv.SaveFile("V1.csv")
-if (success != True):
-    print(csvv.lastErrorText())
+chunks = [str[i:i+1] for i in range(0, len(str), 1)]
+print(chunks[1])

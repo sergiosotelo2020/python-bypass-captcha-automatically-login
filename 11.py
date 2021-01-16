@@ -88,13 +88,14 @@ time.sleep(2)
 submit_button2 = driver.find_element_by_xpath('//button[@type="submit"]')
 submit_button2.click()
 print('login successfully')
-driver.maximize_window()
+# driver.maximize_window()
 
 #Read excel file
 time.sleep(8)
 
 edit_urls = []
 statuss = []
+errors = []
 
 print('--------------read excel file-------------------')
 workbook = load_workbook(filename=file_name)
@@ -165,10 +166,15 @@ for url in urls:
                     url = rows[4]
                     Direct_url = rows[5]
                     Authorization_no = rows[6]
+                    print(Authorization_no)
                     Authorization__agency = rows[7]
+                    print(Authorization__agency)
                     Authorization_date = rows[8]
+                    print(Authorization_date)
                     From = rows[9]
+                    print(From)
                     To = rows[10]
+                    print(To)
                     Country_of_origin = rows[11]
                     sku = str(rows[12])
                     print(sku)
@@ -192,7 +198,41 @@ for url in urls:
                     status = rows[23]
                     print(status)
                     workbook.close() 
-
+                    
+                    time.sleep(2)
+                    # chunks = [sku[i:i+1] for i in range(0, len(sku), 1)]
+                    # print('chunks')
+                    # print(chunks)
+                    # if chunks == '-':
+                    
+                    try:
+                        sku_value = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[2]
+                        print(sku_value)
+                        # actions = ActionChains(driver)
+                        # actions.move_to_element(sku_value).perform()
+                        # sku_value.click()
+                        sku_value.send_keys(sku)
+                        try:
+                            auth_no = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[0]
+                            print(auth_no)
+                            auth_no.send_keys(Authorization_no)
+                        except:
+                            print('no auth number')
+                        try:
+                            auth_agency = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[1]
+                            print(auth_agency)
+                            auth_agency.send_keys(Authorization__agency)
+                        except:
+                            print('no auth agency')
+                    except:
+                        sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
+                        print(sku_value)
+                        # actions = ActionChains(driver)
+                        # actions.move_to_element(sku_value).perform()
+                        # sku_value.click()
+                        sku_value.send_keys(sku)
+                   
+                    
                     # third_part = driver.find_element_by_class_name("stock-section-fieldset")
                     try:
                         country = driver.find_elements_by_css_selector("input.input-xs")[0]
@@ -202,15 +242,7 @@ for url in urls:
                         driver.find_element_by_class_name("ui-select-choices-row-inner").click()
                     except:
                         print('no country')
-                    try:
-                        sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
-                        print(sku_value)
-                        # actions = ActionChains(driver)
-                        # actions.move_to_element(sku_value).perform()
-                        # sku_value.click()
-                        sku_value.send_keys(sku)
-                    except:
-                        print('no sku')
+                    
                     time.sleep(1)
                     
                     try:
@@ -261,7 +293,9 @@ for url in urls:
                         print("2")
                         pincode.send_keys(Pincodes)
                     except:
-                        print('no pincode')
+                        pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[2]
+                        print("22")
+                        pincode.send_keys(Pincodes)
                     time.sleep(1)
                     print('3')
                     if Pincodes == '':
@@ -294,20 +328,29 @@ for url in urls:
                         for state in states:
                             try:
                                 state.click()
-                            
-        
                             except:
                                 print('sorry5')
                     time.sleep(5)
                     print("save")
                     try:
                         driver.find_element_by_xpath('//div[@class="col-sm-6"]/button[@class="button make-model-submit ng-scope ng-isolate-scope"]').click()
+                        
                         time.sleep(10)
                         driver.find_element_by_xpath('//div/a[@class="button success-button"]').click()
+                        
                     except:
-                        print('here')
-
+                        print('here error')
+                        try:
+                            driver.find_elements_by_xpath('//div[@class="input-group-item fa fa-2 circle-right fa-chevron-circle-right"]')[2].click()
+                            time.sleep(1)
+                            errors_tmp = driver.find_elements_by_xpath('//span[@class="tool-tip ng-binding ng-scope"]')
+                            for error_tmp in errors_tmp:
+                                error = error_tmp.text + ","
+                                errors.append(error)
+                        except:
+                            errors.append('')
                     time.sleep(10)
+                    
                     try:
                         driver.switch_to.window(driver.window_handles[1])
                         driver.close()
@@ -343,12 +386,20 @@ for url in urls:
                         statu = 'Published'
                         print('status')
                     except:
-                        statu = 'Already exits'
-                        print('status')
+                        err_len = len(errors)
+                        statu = ''
+                        if err_len > 0:
+                            statu = 'Error occur'
+                        else:
+                            statu = 'Already exits'
+                            errors.append('')
+                    print(statu)
                     statuss.append(statu)
 
                     time.sleep(10)
-                    print("complete")
+                    print("error")
+                    
+                    print(errors)
                     break
 
                 except:
@@ -394,6 +445,9 @@ ee = len(edit_urls)
 print('urls:' + str(ee))
 ss = len(statuss)
 print('status:' + str(ss))
+er = len(errors)
+print('error:' + er)
+
 if ee < ss:
     ee = ss
 
@@ -401,6 +455,8 @@ while k < ee:
     success = csvv.SetCell(k,22,edit_urls[k])
     success = csvv.SaveFile("V.csv")
     success = csvv.SetCell(k,23,statuss[k])
+    success = csvv.SaveFile("V.csv")
+    success = csvv.SetCell(k,24,errors[k])
     success = csvv.SaveFile("V.csv")
     k += 1
 
