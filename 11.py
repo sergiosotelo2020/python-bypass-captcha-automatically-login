@@ -224,6 +224,7 @@ for url in urls:
                             auth_agency.send_keys(Authorization__agency)
                         except:
                             print('no auth agency')
+                        
                     except:
                         sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
                         print(sku_value)
@@ -289,22 +290,42 @@ for url in urls:
                     time.sleep(1)
                     print("1")
                     try:
-                        pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
-                        print("2")
-                        pincode.send_keys(Pincodes)
+                        if Disticts == '':
+                            pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[1]
+                            print("2")
+                            pincode.send_keys(Pincodes)
+                            if Pincodes == '':
+                                print("Pincodes N/A")
+                            else:
+                                try:
+                                    driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
+                                except:
+                                    print('here')
+                        else:
+                            pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                            print("22")
+                            pincode.send_keys(Pincodes)
+                            if Pincodes == '':
+                                print("Pincodes N/A")
+                            else:
+                                try:
+                                    driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
+                                except:
+                                    print('here')
                     except:
                         pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[2]
-                        print("22")
+                        print("222")
                         pincode.send_keys(Pincodes)
+                        if Pincodes == '':
+                            print("Pincodes N/A")
+                        else:
+                            try:
+                                driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
+                            except:
+                                print('here')
                     time.sleep(1)
                     print('3')
-                    if Pincodes == '':
-                        print("N/A")
-                    else:
-                        try:
-                            driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
-                        except:
-                            print('here')
+                    
                     time.sleep(5)
                     try:
                         stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
@@ -337,16 +358,18 @@ for url in urls:
                         
                         time.sleep(10)
                         driver.find_element_by_xpath('//div/a[@class="button success-button"]').click()
-                        
+                        print("button click")
+                        errors.append('')
                     except:
                         print('here error')
                         try:
                             driver.find_elements_by_xpath('//div[@class="input-group-item fa fa-2 circle-right fa-chevron-circle-right"]')[2].click()
                             time.sleep(1)
+                            error = ''
                             errors_tmp = driver.find_elements_by_xpath('//span[@class="tool-tip ng-binding ng-scope"]')
                             for error_tmp in errors_tmp:
-                                error = error_tmp.text + ","
-                                errors.append(error)
+                                error += error_tmp.text + ","
+                            errors.append(error)
                         except:
                             errors.append('')
                     time.sleep(10)
@@ -388,11 +411,12 @@ for url in urls:
                     except:
                         err_len = len(errors)
                         statu = ''
-                        if err_len > 0:
-                            statu = 'Error occur'
-                        else:
+                        kkk = key -1
+                        if errors[kkk] == '':
                             statu = 'Already exits'
-                            errors.append('')
+                        else:
+                            statu = 'Errors Occur'
+                            
                     print(statu)
                     statuss.append(statu)
 
