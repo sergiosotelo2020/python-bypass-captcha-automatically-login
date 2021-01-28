@@ -11,11 +11,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
-from selenium.common.exceptions import InvalidArgumentException
 from datetime import date
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException 
-from selenium.webdriver.common.action_chains import ActionChains
 import selenium.webdriver
 from PIL import Image
 import pytesseract
@@ -58,7 +55,8 @@ while pp < 10:
     im = Image.open('pageImage.png')
     im = im.crop((int(x), int(y), int(width), int(height)))
     im.save('element.png')
-    pytesseract.pytesseract.tesseract_cmd = r'C:/Users/Master/AppData/Local/tesseract.exe'
+    pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
+    #pytesseract.pytesseract.tesseract_cmd = r'C:/Users/Master/AppData/Local/tesseract.exe'
     text = pytesseract.image_to_string(Image.open("element.png"))
     print(text)
     # element=driver.find_element_by_xpath('//span[@class="last-page"]')
@@ -69,7 +67,7 @@ while pp < 10:
     captcha_text = driver.find_element_by_id('captcha_math')
     captcha_text.send_keys(text)
     print("--------Please insert key manually--------------")
-    time.sleep(5)
+    time.sleep(1)
     submit_button=driver.find_elements_by_css_selector("button.btn-nov")[0]
     submit_button.click()
 
@@ -84,11 +82,11 @@ while pp < 10:
 
 password = driver.find_element_by_id('password')
 password.send_keys(GemPassword)
-time.sleep(2)
+time.sleep(1)
 submit_button2 = driver.find_element_by_xpath('//button[@type="submit"]')
 submit_button2.click()
 print('login successfully')
-# driver.maximize_window()
+driver.maximize_window()
 
 #Read excel file
 time.sleep(8)
@@ -104,7 +102,7 @@ workbook = load_workbook(filename=file_name)
 sheet = workbook.active
 urls = []
 x = 0
-for i in sheet['F']: 
+for i in sheet['G']: 
     url = i.value  
     if (url == None):
         break
@@ -121,7 +119,7 @@ loc = file_name
  
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
-
+print(urls)
 # sheet1 = xlrd.open_workbook("Web2Pair.xlsx").sheet_by_index(0) 
 
 key = 1
@@ -129,7 +127,7 @@ for url in urls:
     
     driver.get(url)
     print('-----------redirect to edit page---------------------')
-    time.sleep(10)
+    time.sleep(15)
     try:
         driver.find_element_by_id("flox-chat-close")
         close_button = driver.find_element_by_id("flox-chat-close")
@@ -137,10 +135,64 @@ for url in urls:
             close_button.click()
             
         except:
-            print('here')
+            print('Chat box N/A')
     except:
-        print('not chat box')
+        print('Chat box N/A')
+
     i = 0
+
+    rows = sheet.row_values(key)
+                
+    ProductCatalogID = rows[0]
+    # print(ProductCatalogID)
+    Model = rows[1]
+    Category = rows[2]
+    Brand = rows[3]
+    Price_limit = rows[4]
+    url = rows[5]
+    Direct_url = rows[6]
+    Authorization_no = rows[7]
+    # print(Authorization_no)
+    Authorization__agency = rows[8]
+    # print(Authorization__agency)
+    Authorization_date = int(rows[9])
+    # print(Authorization_date)
+    From = int(rows[10])
+    # print(From)
+    To = int(rows[11])
+    # print(To)
+    Country_of_origin = rows[12]
+    sku = str(rows[13])
+    # print(sku)
+    hsn = int(rows[14])
+    # print(hsn)
+    mrp = int(rows[15])
+    Offer_price = str(rows[16])
+    # print(Offer_price)
+    try:
+        Pincodes = int(rows[17])
+    except:
+        Pincodes = ''
+    Disticts = rows[18]
+    # print(Disticts)
+    State = rows[19]
+    Current_stock = int(rows[20])
+    mqpc = int(rows[21])
+    # print(mqpc)
+    lead_time = int(rows[22])
+    edit_url = rows[23]
+    status = rows[24]
+    # print(status)
+    workbook.close() 
+    if float(rows[4]) > float(rows[16]):
+        errors.append('OFfer price is lower than limit')
+        print('Offer price is lower than limit')
+        key += 1
+        continue
+
+    
+
+
     
     while i < 3:
         try:
@@ -149,172 +201,360 @@ for url in urls:
             popup_button = popup.find_elements_by_css_selector("*")[0]
             popup_button.click()
             time.sleep(10)
-            j = 0
-            while j < 3:
-                try:
-                    driver.find_element_by_class_name("img-guidelines")
-                    print('go')
-                    print(sheet.row_values(key))
-                    
-                    rows = sheet.row_values(key)
-                    
-                    ProductCatalogID = rows[0]
-                    print(ProductCatalogID)
-                    Model = rows[1]
-                    Category = rows[2]
-                    Brand = rows[3]
-                    url = rows[4]
-                    Direct_url = rows[5]
-                    Authorization_no = rows[6]
-                    print(Authorization_no)
-                    Authorization__agency = rows[7]
-                    print(Authorization__agency)
-                    Authorization_date = rows[8]
-                    print(Authorization_date)
-                    From = rows[9]
-                    print(From)
-                    To = rows[10]
-                    print(To)
-                    Country_of_origin = rows[11]
-                    sku = str(rows[12])
-                    print(sku)
-                    hsn = int(rows[13])
-                    print(hsn)
-                    mrp = int(rows[14])
-                    Offer_price = str(rows[15])
-                    print(Offer_price)
-                    try:
-                        Pincodes = int(rows[16])
-                    except:
-                        Pincodes = ''
-                    Disticts = rows[17]
-                    print(Disticts)
-                    State = rows[18]
-                    Current_stock = int(rows[19])
-                    mqpc = int(rows[20])
-                    print(mqpc)
-                    lead_time = int(rows[21])
-                    edit_url = rows[22]
-                    status = rows[23]
-                    print(status)
-                    workbook.close() 
-                    
-                    time.sleep(2)
-                    # chunks = [sku[i:i+1] for i in range(0, len(sku), 1)]
-                    # print('chunks')
-                    # print(chunks)
-                    # if chunks == '-':
-                    
-                    try:
-                        sku_value = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[2]
-                        print(sku_value)
-                        # actions = ActionChains(driver)
-                        # actions.move_to_element(sku_value).perform()
-                        # sku_value.click()
-                        sku_value.send_keys(sku)
-                        try:
-                            auth_no = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[0]
-                            print(auth_no)
-                            auth_no.send_keys(Authorization_no)
-                        except:
-                            print('no auth number')
-                        try:
-                            auth_agency = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[1]
-                            print(auth_agency)
-                            auth_agency.send_keys(Authorization__agency)
-                        except:
-                            print('no auth agency')
-                        
-                    except:
-                        sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
-                        print(sku_value)
-                        # actions = ActionChains(driver)
-                        # actions.move_to_element(sku_value).perform()
-                        # sku_value.click()
-                        sku_value.send_keys(sku)
-                   
-                    
-                    # third_part = driver.find_element_by_class_name("stock-section-fieldset")
-                    try:
-                        country = driver.find_elements_by_css_selector("input.input-xs")[0]
-                        print(country)
-                        country.send_keys(Country_of_origin)
-                        time.sleep(1)
-                        driver.find_element_by_class_name("ui-select-choices-row-inner").click()
-                    except:
-                        print('no country')
-                    
-                    time.sleep(1)
-                    
-                    try:
-                        hsn_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6 wsp-tool-tip-wrap"]/input[@type="text"]')
-                        print(hsn_value)
-                        hsn_value.send_keys(hsn)
-                        
-                    except:
-                        print("sorry1")
-                    time.sleep(1)
-                    
-                    try:
-                        mrp_value = driver.find_element_by_xpath('//div[@class="row ng-scope"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
-                        print(mrp_value)
-                        mrp_value.send_keys(mrp)
-                        
-                    except:
-                        print('sorry2')
-                    time.sleep(1)
 
+            try:
+                print('Start insert')                    
+                
+                
+                time.sleep(2)
+                # chunks = [sku[i:i+1] for i in range(0, len(sku), 1)]
+                # print('chunks')
+                # print(chunks)
+                # if chunks == '-':
+                
+
+
+                try:
+                    sku_value = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[2]
+                    print("Exit SKU1")
+                    # actions = ActionChains(driver)
+                    # actions.move_to_element(sku_value).perform()
+                    # sku_value.click()
+                    sku_value.send_keys(sku)
                     try:
-                        offer_price_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-5 wsp-tool-tip-wrap"]/input[@type="number"]')
-                        offer_price_value.send_keys(Offer_price)
-                        print(offer_price_value)
+                        auth_no = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[0]
+                        print('Exit Auth No')
+                        auth_no.send_keys(Authorization_no)
                     except:
-                        print('sorry3')
+                        print('Auth No N/A')
+                    try:
+                        auth_agency = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')[1]
+                        print('Exit Auth agency')
+                        auth_agency.send_keys(Authorization__agency)
+                    except:
+                        print('Auth agency N/A')
                     
-                    time.sleep(1)
+                except:
+                    sku_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6"]/input[@type="text"]')
+                    print('Exit SKU2')
+                    # actions = ActionChains(driver)
+                    # actions.move_to_element(sku_value).perform()
+                    # sku_value.click()
+                    sku_value.send_keys(sku)
+                # Authorization data
+                xl_date = Authorization_date
+                datetime_date = xlrd.xldate_as_datetime(xl_date, 0)
+                date_object = datetime_date.date()
+
+                year = date_object.year
+                print(year)
+                month = date_object.month
+                print(month)
+                kk = month - 1
+                day = date_object.day
+                print(day)
+                try:
+                    print("date handle start")
                     try:
-                        disticts_value = driver.find_elements_by_xpath('//div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
-                        print(disticts_value[0])
-                        disticts_value[0].send_keys(Disticts)
+                        date_buttons = driver.find_elements_by_xpath('//span/button[@class="btn btn-default"]')
+                        date_buttons[0].click()
                     except:
-                        print('no disticts')
-                        
-                    time.sleep(1)
-                    if Disticts == '':
-                        print("N/A")
-                    else:
-                        try:
-                            driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
-                        except:
-                            print('here')
-                    time.sleep(1)
-                    print("1")
+                        print('no calendar button')
+                    print("date 2")
                     try:
-                        if Disticts == '':
-                            pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[1]
-                            print("2")
-                            pincode.send_keys(Pincodes)
-                            if Pincodes == '':
-                                print("Pincodes N/A")
-                            else:
-                                try:
-                                    driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
-                                except:
-                                    print('here')
+                        tt_button = driver.find_element_by_xpath('//th/button[@class="btn btn-default btn-sm uib-title"]')
+                        tt_button.click()
+                        date_tmp = driver.find_element_by_xpath('//button/strong[@class="ng-binding"]').text
+                        date_tmp = int(date_tmp)
+                        print(date_tmp)
+                        if year == date_tmp:
+                            print('OK')
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+    
+
+                        elif date_tmp > year:
+                            nn = date_tmp - year
+                            for xx in range(nn):
+                                driver.find_element_by_xpath('//button[@class="btn btn-default btn-sm pull-left uib-left"]').click()
+                                print(xx)
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+         
+                            
                         else:
-                            pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
-                            print("22")
-                            pincode.send_keys(Pincodes)
-                            if Pincodes == '':
-                                print("Pincodes N/A")
-                            else:
-                                try:
-                                    driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
-                                except:
-                                    print('here')
+                            nn = year - date_tmp
+                            for xx in range(nn):
+                                driver.find_element_by_xpath('//button[@class="btn btn-default btn-sm pull-right uib-right"]').click()
+                                print(xx)
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
                     except:
-                        pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[2]
-                        print("222")
+                        print('no button')
+                        
+                    
+      
+                except:
+                    print('Authorize date Error')
+
+                # From data
+                xl_date = From
+                datetime_date = xlrd.xldate_as_datetime(xl_date, 0)
+                date_object = datetime_date.date()
+
+                year = date_object.year
+                print(year)
+                month = date_object.month
+                print(month)
+                kk = month - 1
+                day = date_object.day
+                print(day)
+                try:
+                    print("date handle start")
+                    try:
+                        date_buttons = driver.find_elements_by_xpath('//span/button[@class="btn btn-default"]')
+                        date_buttons[1].click()
+                    except:
+                        print('no calendar button')
+                    print("date 2")
+                    try:
+                        driver.find_element_by_xpath('//th/button[@class="btn btn-default btn-sm uib-title"]').click()
+                        date_tmp = driver.find_element_by_xpath('//button/strong[@class="ng-binding"]').text
+                        date_tmp = int(date_tmp)
+                        print(date_tmp)
+                        if year == date_tmp:
+                            print('OK')
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+
+
+                        elif date_tmp > year:
+                            nn = date_tmp - year
+                            for xx in range(nn):
+                                driver.find_element_by_xpath('//button[@class="btn btn-default btn-sm pull-left uib-left"]').click()
+                                print(xx)
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+  
+                            
+                        else:
+                            nn = year - date_tmp
+                            for xx in range(nn):
+                                driver.find_element_by_xpath('//button[@class="btn btn-default btn-sm pull-right uib-right"]').click()
+                                print(xx)
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+                    except:
+                        print('no button')
+   
+                except:
+                    print('Aithorize date Error')
+                
+                # To data
+                xl_date = To
+                datetime_date = xlrd.xldate_as_datetime(xl_date, 0)
+                date_object = datetime_date.date()
+
+                year = date_object.year
+                print(year)
+                month = date_object.month
+                print(month)
+                kk = month - 1
+                day = date_object.day
+                print(day)
+                try:
+                    print("date handle start")
+                    try:
+                        date_buttons = driver.find_elements_by_xpath('//span/button[@class="btn btn-default"]')
+                        date_buttons[2].click()
+                    except:
+                        print('no calendar button')
+                    print("date 2")
+                    try:
+                        driver.find_element_by_xpath('//th/button[@class="btn btn-default btn-sm uib-title"]').click()
+                        date_tmp = driver.find_element_by_xpath('//button/strong[@class="ng-binding"]').text
+                        date_tmp = int(date_tmp)
+                        print(date_tmp)
+                        if year == date_tmp:
+                            print('OK')
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+                   
+
+                        elif date_tmp > year:
+                            nn = date_tmp - year
+                            for xx in range(nn):
+                                driver.find_element_by_xpath('//button[@class="btn btn-default btn-sm pull-left uib-left"]').click()
+                                print(xx)
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+                       
+                            
+                        else:
+                            nn = year - date_tmp
+                            for xx in range(nn):
+                                driver.find_element_by_xpath('//button[@class="btn btn-default btn-sm pull-right uib-right"]').click()
+                                print(xx)
+                            month_button = driver.find_elements_by_xpath('//td[@class="uib-month text-center ng-scope"]/button')[kk]
+                            month_button.click()
+                            day_buttons = driver.find_elements_by_xpath('//td[@class="uib-day text-center ng-scope"]/button/span')
+                            for day_button in day_buttons:
+                                dd = day_button.text
+                                dd = int(dd)
+                                if dd == day:
+                                    day_button.click()
+                                    break
+                                else:
+                                    continue
+                    except:
+                        print('no button')
+                        
+                    
+                except:
+                    print('Aithorize date Error')
+                
+                # third_part = driver.find_element_by_class_name("stock-section-fieldset")
+                try:
+                    country = driver.find_elements_by_css_selector("input.input-xs")[0]
+                    print("Exit country")
+                    country.send_keys(Country_of_origin)
+                    time.sleep(2)
+                    driver.find_element_by_class_name("ui-select-choices-row-inner").click()
+                except:
+                    print('Country N/A')
+                
+                time.sleep(2)
+                
+                try:
+                    hsn_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-6 wsp-tool-tip-wrap"]/input[@type="text"]')
+                    print("Exit HSN")
+                    hsn_value.send_keys(hsn)
+                    
+                except:
+                    print("HSN N/A")
+                time.sleep(1)
+                
+                try:
+                    mrp_value = driver.find_element_by_xpath('//div[@class="row ng-scope"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
+                    print("Exit MRP")
+                    mrp_value.send_keys(mrp)
+                    
+                except:
+                    print('MRP N/A')
+                time.sleep(1)
+
+                try:
+                    offer_price_value = driver.find_element_by_xpath('//div[@class="row"]/div[@class="col-sm-5 wsp-tool-tip-wrap"]/input[@type="number"]')
+                    offer_price_value.send_keys(Offer_price)
+                    print("Exit offer price")
+                except:
+                    print('Offer price N/A')
+                
+                time.sleep(2)
+                try:
+                    disticts_value = driver.find_elements_by_xpath('//div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                    print("Exit distict")
+                    disticts_value[0].send_keys(Disticts)
+                except:
+                    print('Distict N/A')
+                    
+                time.sleep(2)
+                if Disticts == '':
+                    print("Disticts N/A")
+                else:
+                    try:
+                        driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
+                    except:
+                        print('No dropdown')
+                time.sleep(2)
+                print("1")
+                try:
+                    if Disticts == '':
+                        pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[1]
+                        print("Exit pincode")
+                        pincode.send_keys(Pincodes)
+                        if Pincodes == '':
+                            print("Pincodes N/A")
+                        else:
+                            try:
+                                driver.find_elements_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]')[1].click()
+                            except:
+                                print('Pincode N/A')
+                    else:
+                        pincode = driver.find_element_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')
+                        print("Exit Pincode 2")
                         pincode.send_keys(Pincodes)
                         if Pincodes == '':
                             print("Pincodes N/A")
@@ -322,92 +562,117 @@ for url in urls:
                             try:
                                 driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
                             except:
-                                print('here')
-                    time.sleep(1)
-                    print('3')
-                    
-                    time.sleep(5)
-                    try:
-                        stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
-                        current_stock_input = stock[0]
-                        current_stock_input.send_keys(Current_stock)
-                        mqpc_input = stock[1]
-                        mqpc_input.send_keys(mqpc)
-                        lead_time_input = stock[2]
-                        lead_time_input.send_keys(lead_time)
-                    except:
-                        print('no stock')
-                    if State == '':
-                        print('sorry4')
+                                print('No dropdown')
+                except:
+                    pincode = driver.find_elements_by_xpath('//div[@class="panel-body"]/div[@class="ui-select-container ui-select-multiple ui-select-bootstrap dropdown form-control ng-pristine ng-untouched ng-valid ng-scope ng-empty"]/div/input[@type="search"]')[2]
+                    print("Exit pincode 3")
+                    pincode.send_keys(Pincodes)
+                    if Pincodes == '':
+                        print("Pincodes N/A")
                     else:
-                        states = driver.find_elements_by_xpath('//td/span/input[@type="checkbox"]')
                         try:
-                            liElement = driver.find_elements_by_xpath('//div[@class="panel-default ng-scope ng-isolate-scope panel panel-open"]/div/h4/a/span/div/div[@class="input-group-item tab-heading"]')[0]
-                            driver.execute_script("arguments[0].scrollIntoView(true);", liElement)
+                            driver.find_element_by_xpath('//div[@class="ui-select-choices-row ng-scope active"]/span[@class="ui-select-choices-row-inner"]').click()
                         except:
-                            print("no")
-                        for state in states:
-                            try:
-                                state.click()
-                            except:
-                                print('sorry5')
-                    time.sleep(5)
-                    print("save")
+                            print('No dropdown')                  
+                time.sleep(3)
+                try:
+                    stock = driver.find_elements_by_xpath('//div[@class="row"]/div[@class="col-sm-6 tool-tip-wrap"]/input[@type="number"]')
+                    current_stock_input = stock[0]
+                    current_stock_input.send_keys(Current_stock)
+                    mqpc_input = stock[1]
+                    mqpc_input.send_keys(mqpc)
+                    lead_time_input = stock[2]
+                    lead_time_input.send_keys(lead_time)
+                except:
+                    print('Stock Values N/A')
+                if State == '':
+                    print('State N/A')
+                else:
+                    states = driver.find_elements_by_xpath('//td/span/input[@type="checkbox"]')
                     try:
-                        driver.find_element_by_xpath('//div[@class="col-sm-6"]/button[@class="button make-model-submit ng-scope ng-isolate-scope"]').click()
-                        
-                        time.sleep(10)
-                        driver.find_element_by_xpath('//div/a[@class="button success-button"]').click()
-                        print("button click")
-                        errors.append('')
+                        liElement = driver.find_elements_by_xpath('//div[@class="panel-default ng-scope ng-isolate-scope panel panel-open"]/div/h4/a/span/div/div[@class="input-group-item tab-heading"]')[0]
+                        driver.execute_script("arguments[0].scrollIntoView(true);", liElement)
                     except:
-                        print('here error')
+                        print("Ok")
+                    for state in states:
                         try:
-                            driver.find_elements_by_xpath('//div[@class="input-group-item fa fa-2 circle-right fa-chevron-circle-right"]')[2].click()
-                            time.sleep(1)
-                            error = ''
-                            errors_tmp = driver.find_elements_by_xpath('//span[@class="tool-tip ng-binding ng-scope"]')
-                            for error_tmp in errors_tmp:
-                                error += error_tmp.text + ","
-                            errors.append(error)
+                            state.click()
                         except:
-                            errors.append('')
+                            print('State N/A')
+                
+                print("Save Step")
+                time.sleep(5)
+                try:
+                    save_button = driver.find_element_by_xpath('//button[@class="button make-model-submit ng-scope ng-isolate-scope"]')
+                    save_button.click()
+                    print('Save button click')
                     time.sleep(10)
                     
+                    review_button = driver.find_element_by_xpath('//a[@class="button success-button"]')
+                    review_button.click()
+                    print("Button click")
+                    errors.append('')
+                except:
+                    print('here error')
                     try:
-                        driver.switch_to.window(driver.window_handles[1])
-                        driver.close()
-                        driver.switch_to.window(driver.window_handles[0])
-                        print("end")
-                    except:
-                        print('no button')
-                    time.sleep(1)
-                    try:
-                        driver.find_element_by_css_selector("div.agree input.ng-empty")
                         try:
-                            agree = driver.find_element_by_xpath('//div[@class="text-center agree ng-binding ng-scope"]/input[@type="checkbox"]')
-                            agree.click()
+                            ddd = driver.find_elements_by_xpath('//div[@class="input-group-item fa fa-2 circle-right fa-chevron-circle-right"]')[2]
                         except:
-                            print('here')
-                    except:
-                        print('already check')
-                    time.sleep(2)
-                    edit_url = driver.current_url
-                    print(edit_url)
-                    edit_urls.append(edit_url)
-                    
-                    try:
-                        driver.find_element_by_xpath('//input[@value="PUBLISH"]').click()
+                            ddd = driver.find_elements_by_xpath('//div[@class="input-group-item fa fa-2 circle-right fa-chevron-circle-right"]')[1]
+                        ddd.click()
                         time.sleep(2)
+                        error = ''
+                        errors_tmp = driver.find_elements_by_xpath('//span[@class="tool-tip ng-binding ng-scope"]')
+                        for error_tmp in errors_tmp:
+                            error += error_tmp.text + ","
+                        errors.append(error)
                     except:
-                        print('no publish')
-                    time.sleep(1)
+                        errors.append('Already exit')
+                time.sleep(5)
+                
+                try:
+                    driver.switch_to.window(driver.window_handles[1])
+                    driver.close()
+                    driver.switch_to.window(driver.window_handles[0])
+                    print("Switch Browser Success")
+                except:
+                    print('No save button')
+                time.sleep(1)
+
+
+                
+
+                
+                edit_url = driver.current_url
+                print(edit_url)
+                edit_urls.append(edit_url)
+                time.sleep(2)
+                try:
+                    publish_button = driver.find_element_by_xpath('//input[@class="button success-button center-block ng-isolate-scope"]')
+                    publish_button.click()
+
+                    time.sleep(2)
+                    publish_button2 = driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]')
+                    publish_button2.click()
+                    statu = 'Published'
+                    
+                except:
+                    print('Publish Button N/A')
+                    try:   
+                        agree = driver.find_element_by_xpath('//div[@class="text-center agree ng-binding ng-scope"]/input[@type="checkbox"]')   
+                        agree.click()
+                    except:
+                        print("No check box")
+                    publish_button = driver.find_element_by_xpath('//input[@class="button success-button center-block ng-isolate-scope"]')
+                    publish_button.click()
+                    time.sleep(3)
                     try:
-                        driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]').click()
+                        publish_button2 = driver.find_element_by_xpath('//div/div[@class="btn btn-primary"]')
+                        publish_button2.click()
                         time.sleep(5)
                         # statu = driver.find_elements_by_xpath('//tr/td[@id="status"]')[0].text
                         statu = 'Published'
-                        print('status')
+                        print(statu)
                     except:
                         err_len = len(errors)
                         statu = ''
@@ -416,32 +681,31 @@ for url in urls:
                             statu = 'Already exits'
                         else:
                             statu = 'Errors Occur'
-                            
-                    print(statu)
-                    statuss.append(statu)
+                        
+                print(statu)
+                statuss.append(statu)
 
-                    time.sleep(10)
-                    print("error")
-                    
-                    print(errors)
-                    break
+                time.sleep(3)
+                print("Error Status")
+                
+                print(errors)
+                break
 
-                except:
-                    j += 1
-                    print('refresh1')
-                    driver.refresh()
-                    time.sleep(10)
+            except:
+                
+                print('Big Error Occur')
 
-            break
         except:
-            print('no popup')
+            print('No popup')
+            time.sleep(5)
             driver.refresh()
-            time.sleep(15)
+            
             i += 1
             continue
 
     time.sleep(5)
-    print("done" + str(key))
+    print("Done" + str(key))
+    print('-----------------------------------------------------')
     key += 1
     continue  
 
@@ -470,17 +734,17 @@ print('urls:' + str(ee))
 ss = len(statuss)
 print('status:' + str(ss))
 er = len(errors)
-print('error:' + er)
+print('error:' + str(er))
 
 if ee < ss:
     ee = ss
 
 while k < ee:
-    success = csvv.SetCell(k,22,edit_urls[k])
+    success = csvv.SetCell(k,23,edit_urls[k])
     success = csvv.SaveFile("V.csv")
-    success = csvv.SetCell(k,23,statuss[k])
+    success = csvv.SetCell(k,24,statuss[k])
     success = csvv.SaveFile("V.csv")
-    success = csvv.SetCell(k,24,errors[k])
+    success = csvv.SetCell(k,25,errors[k])
     success = csvv.SaveFile("V.csv")
     k += 1
 
@@ -503,4 +767,6 @@ time.sleep(2)
 os.remove("T.csv")
 os.remove("V.csv")
 
-print("done")
+print("All done!!!")
+print("------------------------------------")
+print("Please check result" + file_name)

@@ -1,0 +1,31 @@
+Python project
+https://gem.gov.in/
+
+"ComapnyName" value= Appex Corporate Solutions
+"GemUsername" value= Appex_corp22
+"GemPassword" value= Mybox@005
+
+Step By Step Process
+1) Open Browser and Login with user details
+2) Past and open Direct Url 
+3) wait for popup 
+4) Click OK on the Popup
+5) Fill Form no 3
+6) Click on Save Button
+7) Click on REVIEW T And C Button
+8) Closed General Terms Tab
+9) back to main Tab 
+10) click or check mark  I have read and agreed Radio Button
+11) Copy Page URL and Past in Edit Url Column on Excel
+12) Click on Publish Button
+13) Copy status, and Past to status Column in Excel 
+14) Click on Add another Product Button 
+
+Now Repeat the same From step no 2) Past and open Direct Url
+
+This we need in Multiple Processing Browser (Chrome Thread) Like new fields data Function, ( I mean M_work need to pair Multiple Product together) 
+
+There are two factor, 1) if not come confirm popup window, than we need refresh the browser tab and than wait for popup if still not come than need to refresh again, we can retry total 4 time if still not come than skip that url and use next one 
+
+Factor 2) after click on confirm popup window, need to fully load of product updates page, I mean all 5 section need to load,
+Sometime only section 1 is loading, so that time also we need to retry the process, and we can  total retry 4 time if still not come than skip that URL
